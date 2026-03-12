@@ -29,6 +29,9 @@ files {
     "html/style.css"
 }
 
-dependency 'qb-target'
+dependencies {
+    'qb-target',
+    'core_business'
+}
 
 provide 'LegacyFuel'

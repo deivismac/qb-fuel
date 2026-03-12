@@ -34,6 +34,15 @@ Config.PumpModels = {
 }
 
 -- All known gas stations in game
+-- Core Business integration
+-- Uses core_business closest property API exports for gas station ownership
+Config.CoreBusiness = {
+    enabled = true,             -- Enable/disable core_business integration
+    registerSales = true,       -- Register fuel sales as business income
+    fuelItem = "fuel",          -- Item name in core_business property stash
+    fuelPerLiter = 1,           -- How many stash items equal 1 litre of fuel
+}
+
 Config.GasStations = {
 	vector3(49.4187, 2778.793, 58.043),
 	vector3(263.894, 2606.463, 44.983),
