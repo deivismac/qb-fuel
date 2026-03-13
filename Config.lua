@@ -41,6 +41,7 @@ Config.CoreBusiness = {
     registerSales = true,       -- Register fuel sales as business income
     fuelItem = "fuel",          -- Item name in core_business property stash
     fuelPerLiter = 1,           -- How many stash items equal 1 litre of fuel
+    useCorePay = true,          -- true: use CorePay signature UI for payment (bank), false: charge cash directly
 }
 
 Config.GasStations = {

@@ -50,14 +50,28 @@ QBCore.Functions.CreateCallback('qb-fuel:server:refillVehicle', function (src, c
         return
     end
 
-    if Player.PlayerData.money[Config.MoneyType] >= finalPrice then
-        local success = Player.Functions.RemoveMoney(Config.MoneyType, finalPrice, 'refuel-vehicle')
-        if success then
-            coreBusinessRegisterSale(src, finalPrice, string.format("Fuel sale: $%d (%d litres)", finalPrice, litres))
-        end
-        cb(success)
+    local useCorePay = Config.CoreBusiness and Config.CoreBusiness.enabled and Config.CoreBusiness.useCorePay
+    local coords = useCorePay and getPlayerCoords(src)
+    local businessId = coords and exports['core_business']:closestPropertyGetBusinessId(coords)
+
+    if useCorePay and businessId then
+        exports['core_business']:requestCorePay(src, businessId, finalPrice, string.format("Fuel: %d litres", litres), function(success)
+            if success then
+                cb(true)
+            else
+                cb(false)
+            end
+        end)
     else
-        cb(false)
+        if Player.PlayerData.money[Config.MoneyType] >= finalPrice then
+            local success = Player.Functions.RemoveMoney(Config.MoneyType, finalPrice, 'refuel-vehicle')
+            if success then
+                coreBusinessRegisterSale(src, finalPrice, string.format("Fuel sale: $%d (%d litres)", finalPrice, litres))
+            end
+            cb(success)
+        else
+            cb(false)
+        end
     end
 end)
 
