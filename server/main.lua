@@ -44,25 +44,37 @@ QBCore.Functions.CreateCallback('qb-fuel:server:refillVehicle', function (src, c
 
     local finalPrice = litres * Config.FuelPrice
 
-    if not coreBusinessRemoveFuel(src, litres) then
-        Player.Functions.Notify('Not enough fuel in stock', 'error')
-        cb(false)
-        return
-    end
-
     local useCorePay = Config.CoreBusiness and Config.CoreBusiness.enabled and Config.CoreBusiness.useCorePay
     local coords = useCorePay and getPlayerCoords(src)
     local businessId = coords and exports['core_business']:closestPropertyGetBusinessId(coords)
 
     if useCorePay and businessId then
+        -- CorePay path: verify stock, pay first, remove stock on success
+        local fuelItem = Config.CoreBusiness.fuelItem
+        local fuelPerLiter = Config.CoreBusiness.fuelPerLiter or 1
+        local itemsNeeded = math.max(1, math.ceil(litres * fuelPerLiter))
+        local itemCount = exports['core_business']:closestPropertyItemCount(coords, fuelItem)
+        if itemCount ~= 1000.0 and itemCount < itemsNeeded then
+            Player.Functions.Notify('Not enough fuel in stock', 'error')
+            cb(false)
+            return
+        end
+
         exports['core_business']:requestCorePay(src, businessId, finalPrice, string.format("Fuel: %d litres", litres), function(success)
             if success then
+                coreBusinessRemoveFuel(src, litres)
                 cb(true)
             else
                 cb(false)
             end
         end)
     else
+        if not coreBusinessRemoveFuel(src, litres) then
+            Player.Functions.Notify('Not enough fuel in stock', 'error')
+            cb(false)
+            return
+        end
+
         if Player.PlayerData.money[Config.MoneyType] >= finalPrice then
             local success = Player.Functions.RemoveMoney(Config.MoneyType, finalPrice, 'refuel-vehicle')
             if success then
