@@ -16,8 +16,8 @@ local function coreBusinessRemoveFuel(source, litres)
     if not coords then return true end
 
     local fuelItem = Config.CoreBusiness.fuelItem
-    local fuelPerLiter = Config.CoreBusiness.fuelPerLiter or 1
-    local itemsNeeded = math.max(1, math.ceil(litres * fuelPerLiter))
+    local litersPerItem = Config.CoreBusiness.litersPerFuelItem or 1
+    local itemsNeeded = math.max(1, math.ceil(litres / litersPerItem))
 
     local itemCount = exports['core_business']:closestPropertyItemCount(coords, fuelItem)
     if itemCount == 1000.0 then return true end
@@ -51,8 +51,8 @@ QBCore.Functions.CreateCallback('qb-fuel:server:refillVehicle', function (src, c
     if useCorePay and businessId then
         -- CorePay path: verify stock, pay first, remove stock on success
         local fuelItem = Config.CoreBusiness.fuelItem
-        local fuelPerLiter = Config.CoreBusiness.fuelPerLiter or 1
-        local itemsNeeded = math.max(1, math.ceil(litres * fuelPerLiter))
+        local litersPerItem = Config.CoreBusiness.litersPerFuelItem or 1
+        local itemsNeeded = math.max(1, math.ceil(litres / litersPerItem))
         local itemCount = exports['core_business']:closestPropertyItemCount(coords, fuelItem)
         if itemCount ~= 1000.0 and itemCount < itemsNeeded then
             Player.Functions.Notify('Not enough fuel in stock', 'error')
